@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    :root {
+      --bg: #0e1013;
+      --panel: #16191f;
+      --panel2: #1c2027;
+      --line: #262b34;
+      --text: #eef0f3;
+      --muted: #9aa1ac;
+      --accent: #ff9900;
+      --accent2: #ffc061;
+      --green: #35c07f;
+      --green-dim: #123021;
+      --red: #ff5f52;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      width: 350px;
+      font-family: -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* Header */
+    .head {
+      padding: 16px 18px 14px;
+      background:
+        radial-gradient(120% 100% at 0% 0%, rgba(255,153,0,.14), transparent 60%),
+        linear-gradient(180deg, #171a20, #101216);
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .logo {
+      width: 30px; height: 30px; border-radius: 8px; flex: 0 0 auto;
+      background: linear-gradient(135deg, #ffb84d, #ff9900);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; box-shadow: 0 2px 10px rgba(255,153,0,.35);
+    }
+    .brand h1 { font-size: 15px; margin: 0; font-weight: 700; letter-spacing: -.2px; }
+    .brand .tag { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    .body { padding: 16px 18px 14px; }
+
+    /* Buttons */
+    .btn {
+      width: 100%; padding: 12px; border: 1px solid var(--line);
+      border-radius: 11px; font-size: 13.5px; font-weight: 700;
+      cursor: pointer; color: var(--text); background: var(--panel2);
+      transition: filter .15s, transform .04s, opacity .15s;
+    }
+    .btn:hover:not(:disabled) { filter: brightness(1.15); }
+    .btn:active:not(:disabled) { transform: translateY(1px); }
+    .btn:disabled { opacity: .45; cursor: default; }
+    .btn + .btn { margin-top: 9px; }
+    .btn-ghost { background: var(--panel2); }
+    .btn-primary {
+      background: linear-gradient(135deg, #ff6a5c, #d43417);
+      border: none; color: #fff; box-shadow: 0 4px 16px rgba(212,52,23,.3);
+    }
+    .btn-scan { background: var(--panel2); font-weight: 600; }
+
+    /* Section label */
+    .lbl {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 11px; color: var(--muted); margin: 16px 2px 8px;
+      text-transform: uppercase; letter-spacing: .6px;
+    }
+    .lbl .refresh {
+      text-transform: none; letter-spacing: 0; color: var(--accent2);
+      cursor: pointer; font-weight: 600; font-size: 11px;
+    }
+    .lbl .refresh:hover { text-decoration: underline; }
+
+    /* Manage list */
+    .list { max-height: 260px; overflow-y: auto; }
+    .list::-webkit-scrollbar { width: 6px; }
+    .list::-webkit-scrollbar-thumb { background: #2c313c; border-radius: 3px; }
+    .krow {
+      display: flex; align-items: center; gap: 11px;
+      padding: 9px 11px; margin-bottom: 7px;
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: 10px; cursor: pointer;
+      transition: border-color .12s, background .12s, transform .04s;
+    }
+    .krow:hover { border-color: #3a4150; }
+    .krow:active { transform: scale(.995); }
+    .kthumb {
+      width: 34px; height: 34px; object-fit: contain; border-radius: 7px;
+      background: #fff; flex: 0 0 auto;
+    }
+    .kthumb.ph { background: #242832; }
+    .kname {
+      flex: 1; font-size: 12.5px; color: var(--text);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .tag {
+      font-size: 10.5px; font-weight: 700; padding: 3px 9px;
+      border-radius: 999px; white-space: nowrap;
+      background: rgba(255,95,82,.14); color: #ff8a7a;
+    }
+    .krow.kept { border-color: rgba(53,192,127,.45); background: var(--green-dim); }
+    .krow.kept .kname { color: #fff; }
+    .krow.kept .tag { background: rgba(53,192,127,.18); color: var(--green); }
+
+    /* Empty state */
+    .empty {
+      text-align: center; color: var(--muted); font-size: 12.5px;
+      padding: 18px 8px; line-height: 1.5;
+    }
+
+    /* Progress */
+    .progress-wrap { display: none; margin-top: 6px; }
+    .progress-wrap.show { display: block; }
+    .pbar {
+      height: 10px; background: var(--panel2); border-radius: 6px;
+      overflow: hidden; border: 1px solid var(--line);
+    }
+    .pfill {
+      height: 100%; width: 0%; border-radius: 6px;
+      background: linear-gradient(90deg, #ff9900, #ffcc66);
+      transition: width .3s ease;
+    }
+    .pmeta {
+      display: flex; justify-content: space-between;
+      font-size: 11px; color: var(--muted); margin-top: 6px;
+    }
+    .current {
+      display: flex; align-items: center; gap: 9px;
+      margin-top: 10px; padding: 9px 11px;
+      background: var(--panel2); border: 1px solid var(--line);
+      border-radius: 9px; font-size: 12px;
+    }
+    .spinner, .mini-spin {
+      border: 2px solid rgba(255,153,0,.25); border-top-color: var(--accent);
+      border-radius: 50%; animation: spin .7s linear infinite; flex: 0 0 auto;
+    }
+    .spinner { width: 15px; height: 15px; }
+    .mini-spin { width: 13px; height: 13px; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .current .label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .items { margin-top: 10px; max-height: 180px; overflow-y: auto; }
+    .item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 7px 10px; margin-bottom: 5px;
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: 8px; font-size: 12px;
+    }
+    .item .ico { width: 16px; text-align: center; flex: 0 0 auto; }
+    .item .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+    .item.active { border-color: var(--accent); background: #221a0d; }
+    .item.active .name { color: var(--text); }
+    .item.ok .ico { color: var(--green); }
+    .item.ok .name { color: var(--text); }
+    .item.fail .ico { color: var(--red); }
+
+    /* Summary */
+    .summary {
+      display: none; margin-top: 12px; padding: 13px;
+      border-radius: 11px; background: var(--panel2); border: 1px solid var(--line);
+    }
+    .summary.show { display: block; }
+    .summary .big { font-size: 15px; font-weight: 800; }
+    .summary .sm { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+    .summary .fails { font-size: 11px; color: #ff8a7a; margin-top: 8px; line-height: 1.5; }
+    .summary.good { border-color: rgba(53,192,127,.4); }
+    .summary.good .big { color: var(--green); }
+    .summary.bad { border-color: rgba(255,95,82,.4); }
+    .summary.bad .big { color: #ff8a7a; }
+
+    .status {
+      display: none; margin-top: 12px; font-size: 12.5px; color: var(--muted);
+      text-align: center; line-height: 1.5;
+    }
+    .note {
+      margin-top: 14px; font-size: 11px; color: var(--muted); text-align: center;
+    }
+    .note b { color: var(--accent2); }
+
+    .credit {
+      margin-top: 14px; padding: 12px 18px; text-align: center;
+      border-top: 1px solid var(--line); font-size: 11px; color: var(--muted);
+      background: #0c0e11;
+    }
+    .credit a { color: var(--accent2); text-decoration: none; font-weight: 600; }
+    .credit a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="head">
+    <div class="brand">
+      <div class="logo">📦</div>
+      <div>
+        <h1>Subscribe &amp; Save</h1>
+        <div class="tag">Cancel All</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="body">
+    <button id="openPage" class="btn btn-ghost">Open Subscribe &amp; Save page</button>
+
+    <div class="lbl">
+      <span>Your subscriptions</span>
+      <span class="refresh" id="scan">Refresh</span>
+    </div>
+
+    <div class="empty" id="empty">No subscriptions found on this page.</div>
+
+    <div id="manage" style="display:none;">
+      <div class="list" id="manageList"></div>
+      <div class="note">Tap any item to <b>keep</b> it — kept items are never cancelled.</div>
+    </div>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="pbar"><div class="pfill" id="pfill"></div></div>
+      <div class="pmeta"><span id="pcount">0 / 0</span><span id="ppct">0%</span></div>
+      <div class="current" id="current" style="display:none;">
+        <div class="spinner"></div>
+        <div class="label" id="currentLabel">Starting…</div>
+      </div>
+      <div class="items" id="items"></div>
+    </div>
+
+    <div class="summary" id="summary"></div>
+    <div class="status" id="status"></div>
+
+    <button id="cancelAll" class="btn btn-primary" disabled style="margin-top:14px;">Cancel all</button>
+  </div>
+
+  <div class="credit">
+    Made by Tyler Buza ·
+    <a href="https://buza.dev" target="_blank" rel="noopener">buza.dev</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -14,17 +14,34 @@ the ones you actually want.
 
 Your starred/kept items are remembered, so you're always in control.
 
+Works on **Chrome, Edge, Brave, Opera** (and other Chromium browsers) and
+**Firefox**.
+
 ## How to install
 
-1. **Download** this extension:
-   go to the [**Releases**](../../releases) page and download the latest
-   `.zip` file.
-2. **Unzip** it somewhere you'll remember (like your Desktop).
-3. Open Chrome and go to `chrome://extensions`
-   (copy-paste that into your address bar).
-4. Turn on **Developer mode** (switch in the top-right corner).
-5. Click **Load unpacked** and pick the folder you just unzipped.
-6. Done! Pin it from the puzzle-piece icon so it's easy to find.
+Go to the [**Releases**](../../releases) page and download the zip for your
+browser:
+
+- `...-chromium-...zip` for Chrome / Edge / Brave / Opera
+- `...-firefox-...zip` for Firefox
+
+### Chrome / Edge / Brave / Opera
+
+1. **Unzip** the chromium file somewhere you'll remember (like your Desktop).
+2. Go to `chrome://extensions` (or `edge://extensions`, `brave://extensions`).
+3. Turn on **Developer mode** (top-right switch).
+4. Click **Load unpacked** and pick the folder you just unzipped.
+5. Pin it from the puzzle-piece icon and you're done!
+
+### Firefox
+
+1. **Unzip** the firefox file somewhere you'll remember.
+2. Go to `about:debugging#/runtime/this-firefox`.
+3. Click **Load Temporary Add-on…**
+4. Select the `manifest.json` inside the folder you unzipped.
+
+   *(Temporary add-ons stay until you restart Firefox. A signed permanent
+   version can be added later.)*
 
 ## How to use
 

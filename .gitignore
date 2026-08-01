@@ -1,5 +1,6 @@
 # build artifacts
 *.zip
+dist/
 
 # OS junk
 .DS_Store

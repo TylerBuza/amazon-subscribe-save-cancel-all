@@ -14,7 +14,7 @@ the ones you actually want.
 
 Your starred/kept items are remembered, so you're always in control.
 
-## How to install (2 minutes)
+## How to install
 
 1. **Download** this extension:
    go to the [**Releases**](../../releases) page and download the latest

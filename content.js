@@ -441,6 +441,92 @@ function imageForId(id) {
   return img ? img.getAttribute("src") : null;
 }
 
+// ---------------------------------------------------------------------------
+// Subscription snapshot used by the Amazon-wide shipping reminder
+// ---------------------------------------------------------------------------
+
+const SNAPSHOT_KEY = "snsSubscriptionSnapshot";
+
+function deliveryForId(id) {
+  const card = resolveCard(id);
+  if (!card) return { text: null, timestamp: null };
+  const text = (card.textContent || "").replace(/\s+/g, " ").trim();
+  const match = text.match(
+    /next\s+delivery\s*:?\s*([A-Za-z]{3,9}\s+\d{1,2}(?:,?\s+\d{4})?)/i
+  );
+  if (!match) return { text: null, timestamp: null };
+
+  const label = match[1].trim();
+  const hasYear = /\d{4}/.test(label);
+  const now = new Date();
+  let date = new Date(hasYear ? label : `${label}, ${now.getFullYear()}`);
+  if (Number.isNaN(date.getTime())) return { text: label, timestamp: null };
+
+  // Amazon often omits the year. Treat a date that already passed as next year.
+  if (!hasYear && date.getTime() < now.getTime() - 86400000) {
+    date = new Date(`${label}, ${now.getFullYear() + 1}`);
+  }
+  date.setHours(9, 0, 0, 0);
+  return { text: label, timestamp: date.getTime() };
+}
+
+async function syncSubscriptionSnapshot() {
+  await loadKept();
+  buildIdCardMap();
+  const data = await chrome.storage.local.get(SNAPSHOT_KEY);
+  const previous = data[SNAPSHOT_KEY] || { items: [] };
+  const pending = (previous.items || []).filter((item) => item.pending);
+  const previousById = new Map(
+    (previous.items || []).map((item) => [item.id, item])
+  );
+
+  const normalize = (value) =>
+    String(value || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+
+  const matchedPending = new Set();
+  const items = getSubscriptionIds().map((id) => {
+    const delivery = deliveryForId(id);
+    const title = titleForId(id) || "Amazon subscription";
+    const old = previousById.get(id);
+    const match = pending.find((item) => {
+      const a = normalize(item.title);
+      const b = normalize(title);
+      return a && b && (a.includes(b) || b.includes(a));
+    });
+    if (match && keptSet.has(match.id)) {
+      keptSet.delete(match.id);
+      keptSet.add(id);
+    }
+    if (match) matchedPending.add(match.id);
+    return {
+      id,
+      title,
+      image: imageForId(id),
+      nextDeliveryText:
+        delivery.text || (match && match.nextDeliveryText) || (old && old.nextDeliveryText),
+      nextShipAt:
+        delivery.timestamp || (match && match.nextShipAt) || (old && old.nextShipAt),
+      kept: keptSet.has(id) || !!(match && match.kept),
+      purchaseId: (match && match.purchaseId) || (old && old.purchaseId),
+    };
+  });
+  items.push(...pending.filter((item) => !matchedPending.has(item.id)));
+  await saveKept();
+  try {
+    await chrome.storage.local.set({
+      [SNAPSHOT_KEY]: {
+        items,
+        origin: location.origin,
+        updatedAt: Date.now(),
+      },
+    });
+  } catch (e) {}
+  return items;
+}
+
 async function cancelAll(opts, sendProgress, sendItem) {
   const useDomFallback = !!(opts && opts.useDomFallback);
   await loadKept();
@@ -580,6 +666,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         try {
           decorateCards();
           updateBannerCounts();
+          syncSubscriptionSnapshot();
         } catch (e) {}
         sendResponse({ id: msg.id, kept: nowKept });
       })
@@ -1042,6 +1129,7 @@ function buildBanner() {
     }
     decorateCards();
     refreshCount();
+    syncSubscriptionSnapshot();
     // Re-decorate as Amazon lazy-renders / paginates — throttled so we don't
     // thrash the DOM or interfere with clicks.
     let pending = null;
@@ -1052,6 +1140,7 @@ function buildBanner() {
         try {
           decorateCards();
           refreshCount();
+          syncSubscriptionSnapshot();
         } catch (e) {}
       }, 600);
     });

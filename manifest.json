@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Amazon Subscribe & Save - Cancel All",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Cancel all Amazon Subscribe & Save subscriptions with one click.",
   "permissions": ["activeTab", "scripting", "tabs", "storage"],
   "host_permissions": [
@@ -34,6 +34,15 @@
         "https://www.amazon.co.uk/gp/subscribe-and-save/*"
       ],
       "js": ["content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.amazon.com/*",
+        "https://www.amazon.ca/*",
+        "https://www.amazon.co.uk/*"
+      ],
+      "js": ["reminder.js"],
       "run_at": "document_idle"
     }
   ]

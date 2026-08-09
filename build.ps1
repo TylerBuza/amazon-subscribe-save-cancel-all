@@ -8,7 +8,7 @@ $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $root
 
 # Files shared by both builds (everything except the manifests + tooling).
-$shared = @("popup.html", "popup.js", "content.js", "README.md", "LICENSE", "icons")
+$shared = @("popup.html", "popup.js", "content.js", "reminder.js", "README.md", "LICENSE", "icons")
 
 $dist = Join-Path $root "dist"
 if (Test-Path $dist) { Remove-Item $dist -Recurse -Force }

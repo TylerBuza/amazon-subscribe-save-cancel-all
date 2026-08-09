@@ -10,9 +10,14 @@ the ones you actually want.
 - ⭐ **Keep the ones you want** — just tap to star them, and they'll never be cancelled
 - 🗑️ **Cancel single items** with a button right on the product
 - 📊 Shows your subscriptions with pictures and names
+- 🔔 **Warns you before subscriptions ship** while you're browsing Amazon
+- 🧾 **Detects new subscriptions** from Amazon's confirmation page
 - 🔄 Refreshes the page automatically when it's done
 
 Your starred/kept items are remembered, so you're always in control.
+
+When a delivery is within 7 days, you'll see a small reminder on Amazon. You
+can keep the shipment, cancel it, or close the reminder for the day.
 
 Works on **Chrome, Edge, Brave, Opera** (and other Chromium browsers) and
 **Firefox**.

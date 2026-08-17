@@ -11,9 +11,9 @@ the ones you actually want.
 ### Use the floating panel or browser menu
 
 <p align="center">
-  <img src="screenshots/panel.png" width="420" alt="Floating Amazon panel showing kept and cancelable subscriptions">
+  <img src="screenshots/panel.png" width="360" alt="Floating Amazon panel showing kept and cancelable subscriptions">
   &nbsp;&nbsp;
-  <img src="screenshots/popup.png" width="300" alt="Extension popup showing kept and cancelable subscriptions">
+  <img src="screenshots/popup.png" width="360" alt="Chrome toolbar with the extension menu open">
 </p>
 
 ## What it does

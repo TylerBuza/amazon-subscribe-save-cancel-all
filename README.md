@@ -4,10 +4,16 @@ Tired of clicking through Amazon's menus to cancel your Subscribe & Save items?
 This Chrome extension lets you **cancel them all with one click** — and **keep**
 the ones you actually want.
 
+### Keep or cancel directly on Amazon
+
 ![Amazon Subscribe & Save page with Keep and Cancel controls](screenshots/overview.png)
 
+### Use the floating panel or browser menu
+
 <p align="center">
-  <img src="screenshots/popup.png" width="390" alt="Extension popup showing kept and cancelable subscriptions">
+  <img src="screenshots/panel.png" width="420" alt="Floating Amazon panel showing kept and cancelable subscriptions">
+  &nbsp;&nbsp;
+  <img src="screenshots/popup.png" width="300" alt="Extension popup showing kept and cancelable subscriptions">
 </p>
 
 ## What it does

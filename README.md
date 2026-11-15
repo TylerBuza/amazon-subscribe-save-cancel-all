@@ -1,4 +1,4 @@
-# Amazon Subscribe & Save — Cancel All
+# Amazon Subscribe & Save: Cancel All & Reminders
 
 Tired of clicking through Amazon's menus to cancel your Subscribe & Save items?
 This Chrome extension lets you **cancel them all with one click** — and **keep**

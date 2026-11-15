@@ -1,7 +1,7 @@
 # Build packaged zips for Chromium (Chrome/Edge/Brave/Opera) and Firefox.
 # Usage:  powershell -ExecutionPolicy Bypass -File build.ps1 -Version 1.0.0
 
-param([string]$Version = "1.1.2")
+param([string]$Version = "1.1.3")
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path

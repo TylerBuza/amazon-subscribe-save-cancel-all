@@ -1,6 +1,6 @@
 # Privacy policy
 
-**Amazon Subscribe & Save - Cancel All**  
+**Amazon Subscribe & Save: Cancel All & Reminders**  
 Developer: Tyler Buza · [buza.dev](https://buza.dev)  
 Last updated: November 15, 2026
 

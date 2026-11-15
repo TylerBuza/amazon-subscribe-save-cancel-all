@@ -1,14 +1,14 @@
 # Build packaged zips for Chromium (Chrome/Edge/Brave/Opera) and Firefox.
 # Usage:  powershell -ExecutionPolicy Bypass -File build.ps1 -Version 1.0.0
 
-param([string]$Version = "1.1.1")
+param([string]$Version = "1.1.2")
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $root
 
 # Files shared by both builds (everything except the manifests + tooling).
-$shared = @("popup.html", "popup.js", "cancel.js", "content.js", "reminder.js", "README.md", "LICENSE", "icons")
+$shared = @("popup.html", "popup.js", "cancel.js", "content.js", "reminder.js", "README.md", "PRIVACY.md", "LICENSE", "icons")
 
 $dist = Join-Path $root "dist"
 if (Test-Path $dist) { Remove-Item $dist -Recurse -Force }

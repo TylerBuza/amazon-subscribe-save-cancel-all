@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Amazon Subscribe & Save - Cancel All",
-  "version": "1.1.1",
-  "description": "Cancel all Amazon Subscribe & Save subscriptions with one click.",
-  "permissions": ["activeTab", "scripting", "tabs", "storage"],
+  "version": "1.1.2",
+  "description": "Manage Amazon Subscribe & Save subscriptions: keep favorites, cancel unwanted items, and see upcoming delivery reminders.",
+  "permissions": ["scripting", "storage"],
   "host_permissions": [
     "https://www.amazon.com/*",
     "https://www.amazon.ca/*",

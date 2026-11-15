@@ -71,8 +71,14 @@ browser:
 
 ## Privacy
 
-Everything happens in your browser. No accounts, no tracking, nothing is sent
-anywhere. Your "keep" choices are saved only on your own computer.
+Your subscription details and "keep" choices are stored locally in your browser.
+The extension communicates directly with Amazon using your existing signed-in
+session to read and manage subscriptions. No developer servers, analytics, or ads.
+
+Read the [privacy policy](PRIVACY.md) for details about the data used and how to
+remove it.
+
+This is an independent extension, not affiliated with or endorsed by Amazon.
 
 ## Credit
 

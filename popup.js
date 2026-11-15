@@ -62,7 +62,7 @@ async function ensureAndSend(message, timeoutMs = 20000) {
   } catch (e) {
     await chrome.scripting.executeScript({
       target: { tabId: activeTabId },
-      files: ["content.js"],
+      files: ["cancel.js", "content.js"],
     });
     await new Promise((r) => setTimeout(r, 300));
     return await sendWithTimeout(message, timeoutMs);

@@ -1,7 +1,7 @@
 // Content script: cancels Amazon Subscribe & Save subscriptions.
 //
-// Primary technique (robust, adapted from L422Y's gist via kranix0's userscript,
-// MIT — see README attribution):
+// Cancellation is shared with the reminder in cancel.js:
+// Form-fetch technique adapted from L422Y's gist via kranix0's userscript (MIT).
 //   1. Read subscription ids from [data-subscription-id] elements on the page.
 //   2. For each id, GET /auto-deliveries/ajax/cancelSubscription?...&subscriptionId=<id>
 //      which returns an HTML panel containing <form name="cancelForm">.
@@ -9,10 +9,8 @@
 //      valid anti-CSRF token — filled in by Amazon itself.
 //   3. Submit those exact form fields as a POST. No guessing params/tokens.
 //
-// Fallback: DOM automation (clicking) if the form flow fails.
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const CANCEL_TIMEOUT_MS = 15000;
 
 async function waitFor(fn, timeout = 8000, interval = 250) {
   const end = Date.now() + timeout;
@@ -149,129 +147,20 @@ function editCardForId(id) {
 // Native cancel via Amazon's own cancel form
 // ---------------------------------------------------------------------------
 
-async function fetchWithTimeout(url, options, timeoutMs) {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    return await fetch(
-      url,
-      Object.assign({ credentials: "include" }, options || {}, {
-        signal: controller.signal,
-      })
-    );
-  } finally {
-    clearTimeout(id);
-  }
-}
-
-// Resolve a possibly-relative form action against the page origin.
-function resolveAction(raw) {
-  if (!raw) return null;
-  try {
-    return new URL(raw, location.href).href;
-  } catch (e) {
-    return null;
-  }
-}
-
-// Returns { ok, subscriptionId, reason?, status?, action?, snippet?, panelStatus? }
 async function nativeCancel(subscriptionId) {
-  try {
-    const enc = encodeURIComponent(subscriptionId);
-    const panelUrl =
-      originBase() +
-      "/auto-deliveries/ajax/cancelSubscription" +
-      "?deviceType=desktop&deviceContext=web&subscriptionId=" +
-      enc;
-
-    const resp = await fetchWithTimeout(
-      panelUrl,
-      { headers: { "x-requested-with": "XMLHttpRequest" } },
-      CANCEL_TIMEOUT_MS
-    );
-    if (!resp.ok) {
-      const t = await resp.text().catch(() => "");
-      return {
-        ok: false,
-        subscriptionId,
-        panelStatus: resp.status,
-        reason: "cancel panel request failed: HTTP " + resp.status,
-        snippet: t.slice(0, 220),
-      };
-    }
-
-    const panelHtml = await resp.text();
-    // Parse WITHOUT injecting into the live page (avoids CSP / side effects).
-    const doc = new DOMParser().parseFromString(panelHtml, "text/html");
-
-    let form =
-      doc.querySelector("form[name='cancelForm']") ||
-      doc.querySelector("form[action*='cancel' i]") ||
-      doc.querySelector("form");
-    if (!form) {
-      return {
-        ok: false,
-        subscriptionId,
-        panelStatus: resp.status,
-        reason: "cancelForm not found in panel",
-        snippet: panelHtml.slice(0, 220),
-      };
-    }
-
-    const method = (form.getAttribute("method") || "POST").toUpperCase();
-    const action = resolveAction(form.getAttribute("action")) || panelUrl;
-
-    // Collect every input/select/textarea (hidden fields incl. CSRF token).
-    const body = new URLSearchParams();
-    form
-      .querySelectorAll("input[name], select[name], textarea[name]")
-      .forEach((el) => {
-        const type = (el.getAttribute("type") || "").toLowerCase();
-        if ((type === "checkbox" || type === "radio") && !el.checked) return;
-        body.append(el.getAttribute("name"), el.value != null ? el.value : "");
-      });
-
-    const submit = await fetchWithTimeout(
-      action,
-      {
-        method,
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "x-requested-with": "XMLHttpRequest",
-        },
-        body,
-      },
-      CANCEL_TIMEOUT_MS
-    );
-
-    const t = await submit.text().catch(() => "");
-    if (!submit.ok) {
-      return {
-        ok: false,
-        subscriptionId,
-        status: submit.status,
-        panelStatus: resp.status,
-        action,
-        reason: "cancel form submit failed: HTTP " + submit.status,
-        snippet: t.slice(0, 220),
-      };
-    }
-
-    return {
-      ok: true,
-      subscriptionId,
-      status: submit.status,
-      panelStatus: resp.status,
-      action,
-      snippet: t.slice(0, 120),
-    };
-  } catch (e) {
-    return {
-      ok: false,
-      subscriptionId,
-      reason: e instanceof Error ? e.message : String(e),
-    };
+  const result = await globalThis.snsCancelSubscription(subscriptionId, originBase());
+  if (result.ok || result.code === "inactive") {
+    try {
+      const data = await chrome.storage.local.get(SNAPSHOT_KEY);
+      const snapshot = data[SNAPSHOT_KEY];
+      if (snapshot?.origin === location.origin && Array.isArray(snapshot.items)) {
+        snapshot.items = snapshot.items.filter(item => item.id !== subscriptionId);
+        snapshot.updatedAt = Date.now();
+        await chrome.storage.local.set({ [SNAPSHOT_KEY]: snapshot });
+      }
+    } catch (_) {}
   }
+  return result;
 }
 
 // ---------------------------------------------------------------------------

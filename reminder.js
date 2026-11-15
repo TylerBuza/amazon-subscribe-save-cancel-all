@@ -77,57 +77,6 @@
     await chrome.storage.local.set({ [SNAPSHOT_KEY]: snapshot });
   }
 
-  async function fetchWithTimeout(url, options, timeoutMs = 15000) {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      return await fetch(url, Object.assign({ credentials: "include" }, options, {
-        signal: controller.signal,
-      }));
-    } finally {
-      clearTimeout(timeout);
-    }
-  }
-
-  async function cancelSubscription(item, origin) {
-    try {
-      const panelUrl =
-        origin +
-        "/auto-deliveries/ajax/cancelSubscription" +
-        "?deviceType=desktop&deviceContext=web&subscriptionId=" +
-        encodeURIComponent(item.id);
-      const panelResponse = await fetchWithTimeout(panelUrl, {});
-      if (!panelResponse.ok) return false;
-
-      const html = await panelResponse.text();
-      const doc = new DOMParser().parseFromString(html, "text/html");
-      const form =
-        doc.querySelector("form[name='cancelForm']") ||
-        doc.querySelector("form[action*='cancel' i]") ||
-        doc.querySelector("form");
-      if (!form) return false;
-
-      const body = new URLSearchParams();
-      form
-        .querySelectorAll("input[name], select[name], textarea[name]")
-        .forEach((el) => {
-          const type = (el.getAttribute("type") || "").toLowerCase();
-          if ((type === "checkbox" || type === "radio") && !el.checked) return;
-          body.append(el.getAttribute("name"), el.value || "");
-        });
-
-      const action = new URL(form.getAttribute("action") || panelUrl, origin).href;
-      const response = await fetchWithTimeout(action, {
-        method: (form.getAttribute("method") || "POST").toUpperCase(),
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body,
-      });
-      return response.ok;
-    } catch (e) {
-      return false;
-    }
-  }
-
   function batchKey(items) {
     return items
       .map((item) => `${item.id}:${item.nextShipAt || 0}`)
@@ -164,6 +113,7 @@
         .name{font-size:12.5px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.date{font-size:11px;color:#ffbd59;margin-top:3px}
         .actions{display:flex;gap:7px;margin-top:8px}.actions button{all:unset;cursor:pointer;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:750;text-align:center}.keep{background:#173524;color:#45d18f;border:1px solid #286a49!important}.cancel{background:#d63b20;color:#fff}.working{opacity:.55;pointer-events:none}
         .foot{padding:0 15px 13px;font-size:10.5px;color:#858c97}
+        .error{margin-top:8px;font-size:11px;line-height:1.45;color:#ffb4a6}.error a{display:block;margin-top:5px;color:#ffbd59}
       </style>
       <div class="card" id="card">
         <div class="head"><strong>Subscribe &amp; Save shipping soon</strong><span>${items.length} item${items.length === 1 ? "" : "s"}</span><button class="close" id="close">×</button></div>
@@ -187,7 +137,7 @@
             : '<div class="ph"></div>') +
           `<div><div class="name">${esc(item.title)}</div>` +
           `<div class="date">Ships ${esc(formatDate(item.nextShipAt, item.nextDeliveryText))}</div>` +
-          `<div class="actions"><button class="keep">Keep shipment</button><button class="cancel">${item.pending ? "Review / cancel" : "Cancel now"}</button></div></div>`;
+          `<div class="actions"><button class="keep">Keep shipment</button><button class="cancel">${item.pending ? "Review / cancel" : "Cancel now"}</button></div><div class="error" role="status" hidden></div></div>`;
 
         const finish = () => {
           const index = items.findIndex((x) => x.id === item.id);
@@ -210,15 +160,38 @@
               "/auto-deliveries/viewsubscriptions";
             return;
           }
+          const cancelButton = row.querySelector(".cancel");
+          const keepButton = row.querySelector(".keep");
+          const error = row.querySelector(".error");
+          if (cancelButton.disabled) return;
+          cancelButton.disabled = true;
+          keepButton.disabled = true;
+          error.hidden = true;
           row.classList.add("working");
-          row.querySelector(".cancel").textContent = "Cancelling…";
-          const ok = await cancelSubscription(item, snapshot.origin || location.origin);
-          if (ok) {
-            await removeSnapshotItem(item.id);
-            finish();
-          } else {
+          cancelButton.textContent = "Cancelling…";
+          try {
+            const result = await globalThis.snsCancelSubscription(item.id, snapshot.origin || location.origin);
+            if (result.ok || result.code === "inactive") {
+              await removeSnapshotItem(item.id);
+              finish();
+            } else {
+              showError(result.reason);
+            }
+          } catch (_) {
+            showError("Couldn't update this reminder. Refresh Amazon and check your subscriptions.");
+          } finally {
             row.classList.remove("working");
-            row.querySelector(".cancel").textContent = "Try again";
+            cancelButton.disabled = false;
+            keepButton.disabled = false;
+            cancelButton.textContent = "Cancel now";
+          }
+          function showError(message) {
+            error.textContent = message;
+            const link = document.createElement("a");
+            link.href = (snapshot.origin || location.origin) + "/auto-deliveries/viewsubscriptions";
+            link.textContent = "Open subscriptions on Amazon";
+            error.appendChild(link);
+            error.hidden = false;
           }
         });
         list.appendChild(row);
@@ -391,6 +364,19 @@
       );
       if (!items.length) return;
       if ((dismissed[batchKey(items)] || 0) > now) return;
+      if (items.some(item => !item.pending) &&
+          await globalThis.snsHasNoActiveSubscriptions(snapshot.origin || location.origin)) {
+        // Re-read before writing so a newly captured subscription isn't erased
+        // while the manager request is in flight. Provisional orders stay saved.
+        const latest = (await chrome.storage.local.get(SNAPSHOT_KEY))[SNAPSHOT_KEY];
+        if (!latest || latest.origin !== snapshot.origin || latest.updatedAt !== snapshot.updatedAt) return;
+        latest.items = latest.items.filter(item => item.pending);
+        latest.updatedAt = Date.now();
+        await chrome.storage.local.set({ [SNAPSHOT_KEY]: latest });
+        const pendingItems = items.filter(item => item.pending);
+        if (pendingItems.length) createReminder(pendingItems, latest);
+        return;
+      }
       createReminder(items, snapshot);
     } catch (e) {}
   }

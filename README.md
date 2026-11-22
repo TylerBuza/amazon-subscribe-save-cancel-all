@@ -1,91 +1,67 @@
 # Amazon Subscribe & Save: Cancel All & Reminders
 
-Tired of clicking through Amazon's menus to cancel your Subscribe & Save items?
-This Chrome extension lets you **cancel them all with one click** — and **keep**
-the ones you actually want.
+Keep the subscriptions you still use and cancel the rest together, right on Amazon. Get a reminder while you browse when a delivery is coming up.
 
-**[Install from the Chrome Web Store][chrome-store]**
+<a href="https://chromewebstore.google.com/detail/amazon-subscribe-save-can/lfolfbnoncelnmacofhfjlldpfbdodji"><img src="screenshots/chrome-web-store.png" width="206" alt="Install from the Chrome Web Store"></a>
 
-### Keep or cancel directly on Amazon
+Works on **Amazon.com**, **Amazon.ca**, and **Amazon.co.uk**. Using Firefox? [See installation options](#how-to-install).
 
-![Amazon Subscribe & Save page with Keep and Cancel controls](screenshots/overview.png)
+![Amazon subscription cards: two items marked Kept and two with Keep and Cancel now buttons.](screenshots/overview.png)
 
-### Use the floating panel or browser menu
+## Choose what to keep
+
+1. **Open Subscribe & Save** on the Amazon site where you shop and sign in.
+2. **Select Keep** on each item you want to receive. Kept items are starred, and the extension remembers your choices the next time you visit.
+3. **Check the count before cancelling.** A button labeled **Cancel 6 (keep 2)** requests cancellation for six subscriptions and leaves the two starred ones alone. To cancel just one, use **Cancel now** on its product card.
+
+Cancelling a subscription stops future deliveries once Amazon confirms it. If an order has already been created, check **Your Orders** on Amazon separately.
+
+### Two places to manage your list
+
+Open the floating panel on your Amazon subscriptions page, or click the extension icon in your browser toolbar. Both show which items you’re keeping before you act.
 
 <p align="center">
-  <img src="screenshots/panel.png" width="360" alt="Floating Amazon panel showing kept and cancelable subscriptions">
-  &nbsp;&nbsp;
-  <img src="screenshots/popup.png" width="360" alt="Chrome toolbar with the extension menu open">
+  <img src="screenshots/panel.png" width="360" alt="Floating Amazon panel with two subscriptions kept and six selected for cancellation.">
+  &nbsp;
+  <img src="screenshots/popup.png" width="360" alt="Chrome toolbar with the extension icon highlighted and its subscription menu open.">
 </p>
 
-## What it does
+### Upcoming delivery reminders
 
-- ✅ **Cancel everything** in one click
-- ⭐ **Keep the ones you want** — just tap to star them, and they'll never be cancelled
-- 🗑️ **Cancel single items** with a button right on the product
-- 📊 Shows your subscriptions with pictures and names
-- 🔔 **Warns you before subscriptions ship** while you're browsing Amazon
-- 🧾 **Detects new subscriptions** from Amazon's confirmation page
-- 🔄 Refreshes the page automatically when it's done
-
-Your starred/kept items are remembered, so you're always in control.
-
-When a delivery is within 7 days, you'll see a small reminder on Amazon. You
-can keep the shipment, cancel it, or close the reminder for the day.
-
-Works on **Chrome, Edge, Brave, Opera** (and other Chromium browsers) and
-**Firefox**.
+The extension saves delivery estimates from your subscriptions page and can pick up new subscriptions on Amazon’s confirmation page. When a saved delivery is within seven days, a reminder appears **while you’re browsing Amazon**. Choose **Keep shipment**, cancel the subscription, or close the reminder for 24 hours. The date is Amazon’s delivery estimate, not a cancellation deadline.
 
 ## How to install
 
-**Chrome:** Open the [Chrome Web Store listing][chrome-store] and select **Add to Chrome**.
+**Chrome:** Open the [Chrome Web Store listing][chrome-store] and select **Add to Chrome**. To keep the menu handy, open the puzzle-piece menu in your toolbar and pin the extension.
 
-For Firefox or a manual installation, download the ZIP for your browser from
-[Releases](../../releases):
+<details>
+<summary><strong>Firefox — temporary installation</strong></summary>
 
-- `...-chromium-...zip` for Chrome / Edge / Brave / Opera
-- `...-firefox-...zip` for Firefox
+1. Open [Downloads][downloads], download the ZIP with **firefox** in its name, and unzip it.
+2. Enter `about:debugging#/runtime/this-firefox` in the address bar.
+3. Select **Load Temporary Add-on…** and choose `manifest.json` from the unzipped folder.
 
-### Manual installation for Chrome / Edge / Brave / Opera
+Firefox removes temporary add-ons when it restarts. Repeat steps 2–3 to load it again.
 
-1. **Unzip** the chromium file somewhere you'll remember (like your Desktop).
-2. Go to `chrome://extensions` (or `edge://extensions`, `brave://extensions`).
-3. Turn on **Developer mode** (top-right switch).
-4. Click **Load unpacked** and pick the folder you just unzipped.
-5. Pin it from the puzzle-piece icon and you're done!
+</details>
 
-### Firefox
+<details>
+<summary><strong>Chrome, Edge, Brave, or Opera — manual installation</strong></summary>
 
-1. **Unzip** the firefox file somewhere you'll remember.
-2. Go to `about:debugging#/runtime/this-firefox`.
-3. Click **Load Temporary Add-on…**
-4. Select the `manifest.json` inside the folder you unzipped.
+1. Open [Downloads][downloads], download the ZIP with **chromium** in its name, and unzip it.
+2. Open your browser’s extensions page (`chrome://extensions`, `edge://extensions`, `brave://extensions`, or `opera://extensions`).
+3. Turn on **Developer mode**, select **Load unpacked**, and choose the unzipped folder containing `manifest.json`.
 
-   *(Temporary add-ons stay until you restart Firefox. A signed permanent
-   version can be added later.)*
+</details>
 
-## How to use
+## Privacy & support
 
-1. Go to your Amazon **Subscribe & Save** page and make sure you're signed in.
-2. Tap **Keep** (⭐) on anything you want to protect.
-3. Hit **Cancel all** — everything that isn't kept gets cancelled.
-4. That's it. The page refreshes and you're done.
+Your subscription list, Keep choices, and reminder preferences are stored in your browser. The extension uses your existing Amazon session to read subscriptions and send cancellation requests directly to Amazon. No developer servers, ads, or analytics.
 
-> Heads up: cancelling can't be undone. Anything you keep (⭐) is always safe.
+[Privacy policy](PRIVACY.md) · [Report a problem][issues] · [Downloads][downloads]
 
-## Privacy
-
-Your subscription details and "keep" choices are stored locally in your browser.
-The extension communicates directly with Amazon using your existing signed-in
-session to read and manage subscriptions. No developer servers, analytics, or ads.
-
-Read the [privacy policy](PRIVACY.md) for details about the data used and how to
-remove it.
-
-This is an independent extension, not affiliated with or endorsed by Amazon.
-
-## Credit
-
-Made by **Tyler Buza** · [buza.dev](https://buza.dev)
+Made by [Tyler Buza](https://buza.dev). Independent project; not affiliated with or endorsed by Amazon.
 
 [chrome-store]: https://chromewebstore.google.com/detail/amazon-subscribe-save-can/lfolfbnoncelnmacofhfjlldpfbdodji
+[downloads]: https://github.com/TylerBuza/amazon-subscribe-save-cancel-all/releases/latest
+[issues]: https://github.com/TylerBuza/amazon-subscribe-save-cancel-all/issues

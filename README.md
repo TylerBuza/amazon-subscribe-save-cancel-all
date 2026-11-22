@@ -4,6 +4,8 @@ Tired of clicking through Amazon's menus to cancel your Subscribe & Save items?
 This Chrome extension lets you **cancel them all with one click** — and **keep**
 the ones you actually want.
 
+**[Install from the Chrome Web Store][chrome-store]**
+
 ### Keep or cancel directly on Amazon
 
 ![Amazon Subscribe & Save page with Keep and Cancel controls](screenshots/overview.png)
@@ -36,13 +38,15 @@ Works on **Chrome, Edge, Brave, Opera** (and other Chromium browsers) and
 
 ## How to install
 
-Go to the [**Releases**](../../releases) page and download the zip for your
-browser:
+**Chrome:** Open the [Chrome Web Store listing][chrome-store] and select **Add to Chrome**.
+
+For Firefox or a manual installation, download the ZIP for your browser from
+[Releases](../../releases):
 
 - `...-chromium-...zip` for Chrome / Edge / Brave / Opera
 - `...-firefox-...zip` for Firefox
 
-### Chrome / Edge / Brave / Opera
+### Manual installation for Chrome / Edge / Brave / Opera
 
 1. **Unzip** the chromium file somewhere you'll remember (like your Desktop).
 2. Go to `chrome://extensions` (or `edge://extensions`, `brave://extensions`).
@@ -83,3 +87,5 @@ This is an independent extension, not affiliated with or endorsed by Amazon.
 ## Credit
 
 Made by **Tyler Buza** · [buza.dev](https://buza.dev)
+
+[chrome-store]: https://chromewebstore.google.com/detail/amazon-subscribe-save-can/lfolfbnoncelnmacofhfjlldpfbdodji
